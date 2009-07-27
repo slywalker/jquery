@@ -1,0 +1,4 @@
+copy dispatcher.php APP/dispatcher.php
+
+add line config/bootstrap.php
+App::import('Core', 'Dispatcher', array('file' => APP.'dispatcher.php'));
