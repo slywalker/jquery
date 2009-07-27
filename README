@@ -2,3 +2,9 @@ copy dispatcher.php APP/dispatcher.php
 
 add line config/bootstrap.php
 App::import('Core', 'Dispatcher', array('file' => APP.'dispatcher.php'));
+
+
+add line views/layouts/default.ctp
+echo $javascript->link('/jquery/js/jquery-1.3.2.min');
+echo $javascript->link('/jquery/js/jquery-ui-1.7.2.custom.min');
+echo $html->css('/jquery/css/smoothness/jquery-ui-1.7.2.custom');
