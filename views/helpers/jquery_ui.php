@@ -11,7 +11,7 @@ class JqueryUiHelper extends AppHelper {
 		if (!is_array($contents) && !isset($contents[0]['title']) && !isset($contents[0]['div'])) {
 			return false;
 		}
-		$this->Javascript->codeBlock('$("#'.$options['id'].'").accordion({header:"h3"});', array('inline' => fasle));
+		$this->Javascript->codeBlock('$(function(){$("#'.$options['id'].'").accordion({header:"h3"});});', array('inline' => fasle));
 		$out = '';
 		foreach ($contents as $content) {
 			$h3 = $this->Html->tag('h3', '<a href="#">'.$content['title'].'</a>');
@@ -30,7 +30,7 @@ class JqueryUiHelper extends AppHelper {
 		if (!is_array($contents) && !isset($contents[0]['title']) && !isset($contents[0]['div'])) {
 			return false;
 		}
-		$this->Javascript->codeBlock('$("#'.$options['id'].'").tabs();', array('inline' => false));
+		$this->Javascript->codeBlock('$(function(){$("#'.$options['id'].'").tabs();});', array('inline' => false));
 		$li = array();
 		$divs = '';
 		$i = 1;
@@ -98,4 +98,31 @@ EOT;
 		$this->Javascript->codeBlock($code, array('inline' => false));
 	}
 
+	public function state($html, $options = array()) {
+		$default = array(
+			'type'=>'default',
+			'corner'=>'all',
+			'icon'=>'info',
+		);
+		$options = am($default, $options);
+		$class = 'ui-state-'.$options['type'];
+		unset($options['type']);
+		
+		if ($options['corner']) {
+			$class .= ' ui-corner-'.$options['corner'];
+		}
+		unset($options['corner']);
+		
+		if ($options['icon']) {
+			$html = $this->Html->tag('span', '', array('class'=>'ui-icon ui-icon-'.$options['icon'], 'style'=>'left:0.2em;margin:-8px 5px 0 0;position:absolute;top:50%;')).$html;
+		}
+		unset($options['icon']);
+		
+		$style = 'padding:0.4em 1em 0.4em 20px;position:relative;text-decoration:none;';
+		if (isset($options['style'])) {
+			$style = $style.$options['style'];
+		}
+		$options['style'] = $style;
+		return $this->Html->div($class, $html, $options);
+	}
 }
