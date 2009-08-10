@@ -64,8 +64,11 @@ class JqueryUiHelper extends AppHelper {
 		}
 		$attr = array(
 			'class'=>$htmlAttributes['class'].' ui-state-'.$htmlAttributes['state'].' ui-corner-'.$htmlAttributes['corner'],
-			'style'=>'padding:0.6em 1em 0.4em 20px;position:relative;text-decoration:none;',
+			'style'=>'padding:.4em .8em .2em 1.4em;position:relative;text-decoration:none;',
 		);
+		if (empty($title)) {
+			$attr['style'] = 'padding:.4em .4em .4em 20px;position:relative;text-decoration:none;';
+		}
 		if ($htmlAttributes['id']) {
 			$attr = am($attr, array('id'=>$htmlAttributes['id']));
 		}
@@ -83,7 +86,7 @@ $(function(){
 });
 EOT;
 		$this->Javascript->codeBlock($code, array('inline' => false));
-		return $this->Html->para('ui-button', $a, array('style' => 'margin:.5em 0;'));
+		return $this->Html->para('ui-button', $a, array('style' => 'display:inline;'));
 	}
 
 	public function datepicker($id) {
@@ -124,5 +127,11 @@ EOT;
 		}
 		$options['style'] = $style;
 		return $this->Html->div($class, $html, $options);
+	}
+
+	public function icon($icon) {
+		$out = $this->Html->tag('span', '', array('class' => 'ui-icon ui-icon-'.$icon));
+		$out = $this->Html->para('ui-state-default ui-corner-all', $out, array('style' => 'width:16px;margin:0 4px;float:left;'));
+		return $out;
 	}
 }
