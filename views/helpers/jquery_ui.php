@@ -11,7 +11,7 @@ class JqueryUiHelper extends AppHelper {
 		if (!is_array($contents) && !isset($contents[0]['title']) && !isset($contents[0]['div'])) {
 			return false;
 		}
-		$this->Javascript->codeBlock('$(function(){$("#'.$options['id'].'").accordion({header:"h3"});});', array('inline' => fasle));
+		$this->Javascript->codeBlock('$(function(){$("#'.$options['id'].'").accordion({header:"h3"});});', array('inline' => false));
 		$out = '';
 		foreach ($contents as $content) {
 			$h3 = $this->Html->tag('h3', '<a href="#">'.$content['title'].'</a>');
