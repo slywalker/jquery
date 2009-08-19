@@ -6,12 +6,19 @@ class JqueryUiHelper extends AppHelper {
 		$default = array(
 			'id'=>'accordion',
 			'class'=>null,
+			'active'=>0,
 		);
 		$options = am($default, $options);
 		if (!is_array($contents) && !isset($contents[0]['title']) && !isset($contents[0]['div'])) {
 			return false;
 		}
-		$this->Javascript->codeBlock('$(function(){$("#'.$options['id'].'").accordion({header:"h3"});});', array('inline' => false));
+		$code =
+<<<EOT
+$(function(){
+	$('#{$options['id']}').accordion({header:'h3', autoHeight:false, collapsible:true, active:{$options['active']}});
+});
+EOT;
+		$this->Javascript->codeBlock($code, array('inline' => false));
 		$out = '';
 		foreach ($contents as $content) {
 			$h3 = $this->Html->tag('h3', '<a href="#">'.$content['title'].'</a>');
