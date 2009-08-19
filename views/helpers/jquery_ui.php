@@ -6,16 +6,32 @@ class JqueryUiHelper extends AppHelper {
 		$default = array(
 			'id'=>'accordion',
 			'class'=>null,
+			'header'=>'h3',
+			'autoHeight'=>false,
+			'collapsible'=>true,
 			'active'=>0,
 		);
 		$options = am($default, $options);
+		foreach ($options as $key=>$option) {
+			if ($option === true) {
+				$options[$key] = 'true';
+			}
+			if ($option === false) {
+				$options[$key] = 'false';
+			}
+		}
 		if (!is_array($contents) && !isset($contents[0]['title']) && !isset($contents[0]['div'])) {
 			return false;
 		}
 		$code =
 <<<EOT
 $(function(){
-	$('#{$options['id']}').accordion({header:'h3', autoHeight:false, collapsible:true, active:{$options['active']}});
+	$('#{$options['id']}').accordion({
+		header : '{$options['header']}',
+		autoHeight : {$options['autoHeight']},
+		collapsible : {$options['collapsible']},
+		active : {$options['active']}
+	});
 });
 EOT;
 		$this->Javascript->codeBlock($code, array('inline' => false));
