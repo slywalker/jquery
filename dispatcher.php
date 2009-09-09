@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: dispatcher.php 8237 2009-07-21 01:31:50Z gwoo $ */
+/* SVN FILE: $Id$ */
 /**
  * Dispatcher takes the URL information, parses it for paramters and
  * tells the involved controllers what to do.
@@ -20,9 +20,9 @@
  * @package       cake
  * @subpackage    cake.cake
  * @since         CakePHP(tm) v 0.2.9
- * @version       $Revision: 8237 $
- * @modifiedby    $LastChangedBy: gwoo $
- * @lastmodified  $Date: 2009-07-21 10:31:50 +0900 (Tue, 21 Jul 2009) $
+ * @version       $Revision$
+ * @modifiedby    $LastChangedBy$
+ * @lastmodified  $Date$
  * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
@@ -303,22 +303,28 @@ class Dispatcher extends Object {
 				$params['url'] = $url;
 			}
 		}
+
 		foreach ($_FILES as $name => $data) {
 			if ($name != 'data') {
 				$params['form'][$name] = $data;
 			}
 		}
+
 		if (isset($_FILES['data'])) {
 			foreach ($_FILES['data'] as $key => $data) {
 				foreach ($data as $model => $fields) {
-					foreach ($fields as $field => $value) {
-						if (is_array($value)) {
-							foreach ($value as $k => $v) {
-								$params['data'][$model][$field][$k][$key] = $v;
+					if (is_array($fields)) {
+						foreach ($fields as $field => $value) {
+							if (is_array($value)) {
+								foreach ($value as $k => $v) {
+									$params['data'][$model][$field][$k][$key] = $v;
+								}
+							} else {
+								$params['data'][$model][$field][$key] = $value;
 							}
-						} else {
-							$params['data'][$model][$field][$key] = $value;
 						}
+					} else {
+						$params['data'][$model][$key] = $fields;
 					}
 				}
 			}
@@ -592,7 +598,10 @@ class Dispatcher extends Object {
 				$this->_stop();
 			}
 			$isAsset = false;
+			//$assets = array('js' => 'text/javascript', 'css' => 'text/css', 'gif' => 'image/gif', 'jpg' => 'image/jpeg', 'png' => 'image/png');
+			// add by slywalker
 			$assets = array('js' => 'text/javascript', 'css' => 'text/css', 'gif' => 'image/gif', 'jpg' => 'image/jpeg', 'png' => 'image/png', 'html' => 'text/html', 'xml' => 'text/xml');
+			
 			$ext = array_pop(explode('.', $url));
 
 			foreach ($assets as $type => $contentType) {
@@ -601,12 +610,14 @@ class Dispatcher extends Object {
 						$pos = strpos($url, $type . '/');
 					} else {
 						$pos = strpos($url, 'img/');
+						// add by slywalker start
 						if ($pos === false) {
 							$pos = strpos($url, 'js/');
 						}
 						if ($pos === false) {
 							$pos = strpos($url, 'css/');
 						}
+						// add by slywalker end
 					}
 					$isAsset = true;
 					break;
@@ -625,7 +636,7 @@ class Dispatcher extends Object {
 
 				if ($pos > 0) {
 					$plugin = substr($url, 0, $pos - 1);
-					$url = str_replace($plugin . '/', '', $url);
+					$url = preg_replace('/^' . preg_quote($plugin, '/') . '\//i', '', $url);
 					$pluginPaths = Configure::read('pluginPaths');
 					$count = count($pluginPaths);
 					for ($i = 0; $i < $count; $i++) {
