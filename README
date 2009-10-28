@@ -1,7 +1,5 @@
-copy dispatcher.php APP/dispatcher.php
-
 add line config/bootstrap.php
-App::import('Core', 'Dispatcher', array('file' => APP.'dispatcher.php'));
+App::import('Core', 'Dispatcher', array('file' => 'your_plugins_path'.DS.'jquery'.DS.'dispatcher.php'));
 
 
 add line views/layouts/default.ctp
