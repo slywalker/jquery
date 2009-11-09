@@ -4,15 +4,15 @@ class JqueryUiHelper extends AppHelper {
 
 	public function accordion($contents, $options = array()) {
 		$default = array(
-			'id'=>'accordion',
-			'class'=>null,
-			'header'=>'h3',
-			'autoHeight'=>false,
-			'collapsible'=>true,
-			'active'=>0,
+			'id' => 'accordion',
+			'class' => null,
+			'header' => 'h3',
+			'autoHeight' => false,
+			'collapsible' => true,
+			'active' => 0,
 		);
-		$options = am($default, $options);
-		foreach ($options as $key=>$option) {
+		$options = array_merge($default, $options);
+		foreach ($options as $key => $option) {
 			if ($option === true) {
 				$options[$key] = 'true';
 			}
@@ -35,19 +35,19 @@ $(function(){
 });
 EOT;
 		$this->Javascript->codeBlock($code, array('inline' => false));
-		$out = '';
+		$out = array();
 		foreach ($contents as $content) {
 			$h3 = $this->Html->tag('h3', '<a href="#">'.$content['title'].'</a>');
 			$div = $this->Html->div(null, $content['div']);
-			$out .= $h3.$div;
+			$out[] = $h3.$div;
 		}
-		return $this->Html->div($options['class'], $out, array('id'=>$options['id']));
+		return $this->Html->div($options['class'], implode("\n", $out), array('id' => $options['id']));
 	}
 
 	public function tabs($contents, $options = array()) {
 		$default = array(
-			'id'=>'tabs',
-			'class'=>null,
+			'id' => 'tabs',
+			'class' => null,
 		);
 		$options = am($default, $options);
 		if (!is_array($contents) && !isset($contents[0]['title']) && !isset($contents[0]['div'])) {
@@ -55,61 +55,67 @@ EOT;
 		}
 		$this->Javascript->codeBlock('$(function(){$("#'.$options['id'].'").tabs();});', array('inline' => false));
 		$li = array();
-		$divs = '';
+		$divs = array();
 		$i = 1;
 		foreach ($contents as $content) {
 			$li[] = $this->Html->tag('h3', '<a href="#'.$options['id'].'-'.$i.'">'.$content['title'].'</a>');
-			$divs .= $this->Html->div(null, $content['div'], array('id'=>$options['id'].'-'.$i));
+			$divs[] = $this->Html->div(null, $content['div'], array('id'=>$options['id'].'-'.$i));
 			$i++;
 		}
-		$out = $this->Html->nestedList($li);
-		$out .= $divs;
-		return $this->Html->div($options['class'], $out, array('id'=>$options['id']));
+		$out = array();
+		$out[] = $this->Html->nestedList($li);
+		$out[] = implode("\n", $divs);
+		return $this->Html->div($options['class'], implode("\n", $out), array('id' => $options['id']));
 	}
 	
 	public function link($title, $url = null, $htmlAttributes = array(), $confirmMessage = false, $escapeTitle = true) {
 		$default = array(
-			'id'=>null,
-			'class'=>null,
-			'icon'=>'newwin',
-			'state'=>'default',
-			'corner'=>'all',
+			'id' => null,
+			'class' => null,
+			'icon' => 'newwin',
+			'state' => 'default',
+			'corner' => 'all',
 		);
-		$htmlAttributes = am($default, $htmlAttributes);
+		$htmlAttributes = array_merge($default, $htmlAttributes);
 		
 		$span = '';
 		if ($htmlAttributes['icon']) {
 			$attr = array(
-				'class'=>'ui-icon ui-icon-'.$htmlAttributes['icon'],
-				'style'=>'left:0.2em;margin:-8px 5px 0 0;position:absolute;top:50%;',
+				'class' => 'ui-icon ui-icon-'.$htmlAttributes['icon'],
+				'style' => 'left:0.2em;margin:-8px 5px 0 0;position:absolute;top:50%;',
 			);
 			$span = $this->Html->tag('span', '', $attr);
 		}
+		$classes = array(
+			$htmlAttributes['class'],
+			'ui-button',
+			'ui-state-'.$htmlAttributes['state'],
+			'ui-corner-'.$htmlAttributes['corner'],
+		);
 		$attr = array(
-			'class'=>$htmlAttributes['class'].' ui-state-'.$htmlAttributes['state'].' ui-corner-'.$htmlAttributes['corner'],
-			'style'=>'padding:.4em .8em .2em 1.4em;position:relative;text-decoration:none;',
+			'class' => implode(' ', $classes),
+			'style' => 'padding:.4em .8em .2em 1.4em;position:relative;text-decoration:none;',
 		);
 		if (empty($title)) {
 			$attr['style'] = 'padding:.4em .4em .4em 20px;position:relative;text-decoration:none;';
 		}
 		if ($htmlAttributes['id']) {
-			$attr = am($attr, array('id'=>$htmlAttributes['id']));
+			$attr = array_merge($attr, array('id' => $htmlAttributes['id']));
 		}
 		if ($escapeTitle) {
 			$title = h($title);
 		}
-		$a = $this->Html->link($span.$title, $url, $attr, $confirmMessage, false);
 		$code =
 <<<EOT
 $(function(){
-	$('p.ui-button a').hover(
+	$('a.ui-button').hover(
 		function() { $(this).addClass('ui-state-hover'); },
 		function() { $(this).removeClass('ui-state-hover'); }
 	);
 });
 EOT;
 		$this->Javascript->codeBlock($code, array('inline' => false));
-		return $this->Html->para('ui-button', $a, array('style' => 'display:inline;'));
+		return $this->Html->link($span.$title, $url, $attr, $confirmMessage, false);;
 	}
 
 	public function datepicker($id) {
@@ -126,16 +132,17 @@ EOT;
 
 	public function state($html, $options = array()) {
 		$default = array(
-			'type'=>'default',
-			'corner'=>'all',
-			'icon'=>'info',
+			'type' => 'default',
+			'corner' => 'all',
+			'icon' => 'info',
 		);
-		$options = am($default, $options);
-		$class = 'ui-state-'.$options['type'];
+		$options = array_merge($default, $options);
+		$class = array();
+		$class[] = 'ui-state-'.$options['type'];
 		unset($options['type']);
 		
 		if ($options['corner']) {
-			$class .= ' ui-corner-'.$options['corner'];
+			$class[] = 'ui-corner-'.$options['corner'];
 		}
 		unset($options['corner']);
 		
@@ -149,7 +156,7 @@ EOT;
 			$style = $style.$options['style'];
 		}
 		$options['style'] = $style;
-		return $this->Html->div($class, $html, $options);
+		return $this->Html->div(implode(' ', $class), $html, $options);
 	}
 
 	public function icon($icon) {
